@@ -22,13 +22,13 @@ template <typename T>
 inline ComponentID getComponentTypeID() noexcept
 {
     static ComponentID typeID = getComponentTypeID();
-    return typeID();
+    return typeID;
 }
 
-constexpr std::size_t maxCoponents = 32;
+constexpr std::size_t maxComponents = 32;
 
-using ComponentBitset = std::bitset<maxCoponents>;
-using ComponentArray = std::array<Component *, maxCoponents>;
+using ComponentBitset = std::bitset<maxComponents>;
+using ComponentArray = std::array<Component *, maxComponents>;
 
 class Component
 {
@@ -56,17 +56,21 @@ public:
     {
         for (auto &c : components)
             c->update();
+    }
+
+    void draw()
+    {
         for (auto &c : components)
             c->draw();
     }
-    void draw() {}
+
     bool isActive() { return active; }
     void destroy() { active = false; }
 
     template <typename T>
     bool hasComponent() const
     {
-        return componentBitset[getComponentID<T>];
+        return componentBitset[getComponentTypeID<T>];
     }
 
     template <typename T, typename... TArgs>
@@ -88,7 +92,7 @@ public:
     T &getComponent() const
     {
         auto ptr(componentArray[getComponentTypeID<T>()]);
-        return *static_cast<T *> ptr;
+        return *static_cast<T *>(ptr);
     }
 };
 
@@ -103,6 +107,7 @@ public:
         for (auto &e : entities)
             e->update();
     }
+
     void draw()
     {
         for (auto &e : entities)
@@ -116,12 +121,12 @@ public:
                        std::end(entities));
     }
 
-    Entity& addEntity()
+    Entity &addEntity()
     {
         Entity *e = new Entity();
-        std::unique_ptr<Entity> uPtr { e };
+        std::unique_ptr<Entity> uPtr{e};
         entities.emplace_back(std::move(uPtr));
 
-        return *e; 
+        return *e;
     }
 };
