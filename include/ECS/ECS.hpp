@@ -64,7 +64,7 @@ public:
             c->draw();
     }
 
-    bool isActive() { return active; }
+    bool isActive() const { return active; }
     void destroy() { active = false; }
 
     template <typename T>
@@ -73,6 +73,7 @@ public:
         return componentBitset[getComponentTypeID<T>];
     }
 
+    //! problem is somewhere here !
     template <typename T, typename... TArgs>
     T &addComponent(TArgs &&...mArgs)
     {

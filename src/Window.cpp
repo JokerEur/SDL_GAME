@@ -38,7 +38,7 @@ void Window::init(const std::string &name, int wight, int hight)
     }
 
     player.addComponent<PositionComponent>();
-    player.addComponent<SpriteComponent>("/home/ivan/Documents/workspace/WinterForest/assets/sprite/logo.png");
+    //player.addComponent<SpriteComponent>("/home/ivan/Documents/workspace/WinterForest/assets/sprite/logo.png");
 }
 
 void Window::handleEvent()
