@@ -1,13 +1,13 @@
 #include "GameObject.hpp"
 
-Core::GameObject::GameObject(const std::string texturesheet, int x, int y)
+GameObject::GameObject(const std::string texturesheet, int x, int y)
 {
     ObjTexture = TextureManager::loadTexture(texturesheet);
     x_pos = x;
     y_pos = y;
 }
 
-void Core::GameObject::Update()
+void GameObject::Update()
 {
 
     srcRect.h = 32;
@@ -21,7 +21,7 @@ void Core::GameObject::Update()
     dstRect.h = srcRect.h * 2;
 }
 
-void Core::GameObject::Render()
+void GameObject::Render()
 {
-    SDL_RenderCopy(Core::Window::renderer,ObjTexture, &srcRect, &dstRect);
+    SDL_RenderCopy(Window::renderer,ObjTexture, &srcRect, &dstRect);
 }

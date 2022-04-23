@@ -1,80 +1,78 @@
 #include "Window.hpp"
+#include "TextureManager.hpp"
+#include "ECS/Components.hpp"
 
-#include "ECS.hpp"
-#include "Components.hpp"
+SDL_Renderer *Window::renderer = nullptr;
+Manager manager;
 
-namespace Core
+auto &player(manager.addEntity());
+
+Window::Window(const std::string &name, int wight, int hight)
 {
-    Manager manager;
-    auto& newPlayer(manager.addEntity());
-    GameObject *player;
-    SDL_Renderer *Window::renderer = nullptr;
+    init(name, wight, hight);
+}
 
-    Window::Window(const std::string &name, int wight, int hight)
-    {
-        init(name, wight, hight);
-    }
+void Window::init(const std::string &name, int wight, int hight)
+{
 
-    void Window::init(const std::string &name, int wight, int hight)
+    IMG_Init(IMG_INIT_PNG);
+
+    if (SDL_Init(SDL_INIT_EVERYTHING) == 0)
     {
 
-        IMG_Init(IMG_INIT_PNG);
+        window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, wight, hight, SDL_WINDOW_SHOWN);
 
-        if (SDL_Init(SDL_INIT_EVERYTHING) == 0)
+        if (!window)
         {
-
-            window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, wight, hight, SDL_WINDOW_SHOWN);
-
-            if (!window)
-            {
-                std::cout << " window failed to init. Error: " << SDL_GetError()
-                          << '\n';
-            }
-
-            renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
-            if (renderer)
-            {
-                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-            }
-            isRunnig = true;
+            std::cout << " window failed to init. Error: " << SDL_GetError()
+                      << '\n';
         }
-        player = new GameObject("/home/ivan/Documents/workspace/WinterForest/assets/sprite/logo.png", 0, 0);
-        
-    }
 
-    void Window::render()
-    {
-        SDL_RenderClear(renderer);
-        player->Render();
-        SDL_RenderPresent(renderer);
-    }
+        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-    void Window::update()
-    {
-        player->Update();
-    }
-
-    void Window::handleEvent()
-    {
-        SDL_Event event;
-        SDL_PollEvent(&event);
-        switch (event.type)
+        if (renderer)
         {
-        case SDL_QUIT:
-            isRunnig = false;
-            break;
-
-        default:
-            break;
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         }
+        isRunnig = true;
     }
 
-    Window::~Window()
+    player.addComponent<PositionComponent>();
+    player.addComponent<SpriteComponent>("/home/ivan/Documents/workspace/WinterForest/assets/sprite/logo.png");
+}
+
+void Window::handleEvent()
+{
+    SDL_Event event;
+    SDL_PollEvent(&event);
+    switch (event.type)
     {
-        SDL_DestroyWindow(window);
-        SDL_DestroyRenderer(renderer);
-        SDL_Quit();
-    }
+    case SDL_QUIT:
+        isRunnig = false;
+        break;
 
+    default:
+        break;
+    }
+}
+
+void Window::update()
+{
+   manager.refresh();
+   manager.update();
+}
+
+void Window::render()
+{
+    SDL_RenderClear(renderer);
+    manager.draw();
+    SDL_RenderPresent(renderer);
+}
+
+
+Window::~Window()
+{
+    SDL_DestroyWindow(window);
+    SDL_DestroyRenderer(renderer);
+    SDL_Quit();
 }
